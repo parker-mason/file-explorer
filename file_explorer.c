@@ -56,7 +56,7 @@ void run( void )
   int folder_counter = 0;
   while (true)
   {
-    printf( "parker@PAKRERMASON%s$ ", globals.current_path );
+    printf( "parker@PAKRERMASON:%s$ ", globals.current_path );
     fgets( globals.input, sizeof( globals.input ), stdin );
     globals.input[strcspn( globals.input, "\n" )] = 0;
     memset( globals.command, 0, strlen( globals.command ) );
