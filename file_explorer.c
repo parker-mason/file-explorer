@@ -1,32 +1,23 @@
 #include "file_explorer.h"
 
-Globals globals = {
-  .home = new_folder( "home" ),
-  .current_path = "~",
-  .command = "",
-  .new_thing = "",
-  .input = ""
-};
+Globals globals;
 
 File touch( char *name, uint8_t permissions )
 {
   File file = {
     .name = strdup( name ),
-    .path = golbals.current_path,
+    .path = globals.current_path,
     .permissions = permissions,
     .contents = NULL
   };
   return file;
 }
 
-Folder mkdir( char *name )
+Folder * mkdir( char *name )
 {
-  Folder folder = {
-    .name = strdup( name ),
-    .path = globals.current_path,
-    .files = NULL,
-    .folders = NULL
-  };
+  Folder *folder = (Folder * ) malloc( sizeof( Folder ) );
+  folder->name = strdup( name );
+  folder->path = globals.current_path;
   return folder;
 }
 
@@ -34,29 +25,40 @@ File code( File file )
 {
   system( "clear" );
   file.contents = strdup( fgets( globals.input, sizeof( globals.input ), stdin ) );
-  reutrn file;
+  return file;
 }
 
 void cd( char *new_directory )
 {
-  if (strncmp( globals.current_path, "~", 1 ))
+  static char last_dir[50];
+  if (strncmp( globals.current_path, "~", 1 ) == 0)
   {
     strcpy( globals.current_path, "" );
+  } if (strncmp( new_directory, "..\0", 2 ) == 0)
+  {
+
   }
-  strcat( globals.current_path, "/" ):
-  strcat( globals.currrent_path, strdup( new_directory ) );
+  strcat( globals.current_path, "/" );
+  strcat( globals.current_path, strdup( new_directory ) );
 }
 
 void run( void )
 {
+  globals = (Globals) {
+    .home = mkdir( "home" ),
+    .current_path = "~",
+    .command = "",
+    .new_thing = "",
+    .input = ""
+  };
   system( "clear" );
   int file_counter = 0;
   int folder_counter = 0;
   while (true)
   {
     printf( "parker@PAKRERMASON%s$ ", globals.current_path );
-    fgets( globals.input, sizeof(globals.input), stdin );
-    input[strcspn( globals.input, "\n" )] = 0;
+    fgets( globals.input, sizeof( globals.input ), stdin );
+    globals.input[strcspn( globals.input, "\n" )] = 0;
     memset( globals.command, 0, strlen( globals.command ) );
     memset( globals.new_thing, 0, strlen( globals.new_thing ) );
 
@@ -73,25 +75,35 @@ void run( void )
 
       if (file_counter < 5)
       {
-        globals.home.files[file_counter] = touch( globals.new_thing, ADMIN_PERMSISSIONS );
+        globals.home->files[file_counter] = touch( globals.new_thing, ADMIN_PERMISSIONS );
         file_counter++;
       } else
       {
         puts( "ERROR: Max files reached" );
       }
-    } else if (strncmp( globals.input, "ls\0", 2 ))
+    } else if (strncmp( globals.input, "ls\0", 2 ) == 0)
     {
       strcpy( globals.command, LS_COMMAND );
       
-      for (int i = 0; i < sizeof( globals.home.files ) / sizeof( globals.home.files[0] ); i++)
+      for (int i = 0; i < 2; i++)
       {
-        if (globals.home.files[j].name != NULL)
+        if (globals.home->folders[i] != NULL)
         {
-          printf( "%s ", globals.home.files[j].name );
+          printf( "|%s| ", globals.home->folders[i]->name );
         }
       }
-      printf( "\n" );
-    } else if (strncmp( globals.input, "cd ", 3 ))
+
+      for (int i = 0; i < 5; i++)
+      {
+        if (globals.home->files[i].name != NULL)
+        {
+          printf( "%s ", globals.home->files[i].name );
+        }
+      }
+      if (file_counter || folder_counter) {
+        printf( "\n" );
+      }
+    } else if (strncmp( globals.input, "cd ", 3 ) == 0)
     {
       int parser = strlen( CD_COMMAND ) + 1;
       strcpy( globals.command, CD_COMMAND );
@@ -103,7 +115,7 @@ void run( void )
       }
       
       cd( globals.new_thing );
-    } else if (strncmp( globals.input, "mkdir ", 5 ))
+    } else if (strncmp( globals.input, "mkdir ", 5 ) == 0)
     {
       int parser = strlen( MKDIR_COMMAND ) + 1;
       strcpy( globals.command, MKDIR_COMMAND );
@@ -113,15 +125,19 @@ void run( void )
         globals.new_thing[i] = globals.input[parser];
         parser++;
       }
-
       if (folder_counter < 2)
       {
-        globals.home.folders[folder_counter] = mkdir( globals.new_thing );
+        globals.home->folders[folder_counter] = mkdir( globals.new_thing );
         folder_counter++;
       } else
       {
         puts( "ERROR: Max folders reached" );
       }
+    } else if (strncmp( globals.input, "clear\0", 5) == 0)
+    {
+      strcpy( globals.command, CLEAR_COMMAND );
+      
+      system( "clear" );
     }
   }
 }
