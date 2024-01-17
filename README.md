@@ -1,2 +1,2 @@
 # file-explorer
-similar to Ubuntu terminal but less commands and stuff
+similar to Linux terminal but less commands and stuff
