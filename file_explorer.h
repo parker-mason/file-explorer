@@ -36,4 +36,10 @@ struct Globals
   char[255] input;
 };
 
+File touch ( char *name, uint8_t permissions );
+Folder mkdir ( char *name );
+File code( File file );
+void cd( char *new_directory );
+void run( void );
+
 #endif
