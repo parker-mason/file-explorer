@@ -33,7 +33,7 @@ Folder mkdir( char *name )
 File code( File file )
 {
   system( "clear" );
-  file.contents = fgets( globals.input, sizeof( globals.input ), stdin );
+  file.contents = strdup( fgets( globals.input, sizeof( globals.input ), stdin ) );
   reutrn file;
 }
 
