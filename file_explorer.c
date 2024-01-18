@@ -82,6 +82,7 @@ void run( void )
     } else if (strncmp( globals.input, "ls\0", 2 ))
     {
       strcpy( globals.command, LS_COMMAND );
+      
       for (int i = 0; i < sizeof( globals.home.files ) / sizeof( globals.home.files[0] ); i++)
       {
         if (globals.home.files[j].name != NULL)
@@ -97,33 +98,30 @@ void run( void )
 
       for (int i = 0; i < strlen( globals.input ) - strlen( CD_COMMAND ) - 1; i++)
       {
+        globals.new_thing[i] = globals.input[parser];
+        parser++;
+      }
+      
+      cd( globals.new_thing );
+    } else if (strncmp( globals.input, "mkdir ", 5 ))
+    {
+      int parser = strlen( MKDIR_COMMAND ) + 1;
+      strcpy( globals.command, MKDIR_COMMAND );
+  
+      for (int i = 0; i < strlen( globals.input ) - strlen( MKDIR_COMMAND ) + 1; i++)
+      {
+        globals.new_thing[i] = globals.input[parser];
+        parser++;
+      }
 
+      if (folder_counter < 2)
+      {
+        globals.home.folders[folder_counter] = mkdir( globals.new_thing );
+        folder_counter++;
+      } else
+      {
+        puts( "ERROR: Max folders reached" );
       }
     }
   }
 }
-
-struct File
-{
-  char[255] name;
-  char[100] path;
-  uint8_t permissions;
-  char* contents;
-};
-
-struct Folder
-{
-  char[255] name;
-  char[100] path;
-  File files[5];
-  Folder *folders;
-};
-
-struct Globals
-{
-  Folder home;
-  char[100] current_path;
-  char[255] command;
-  char[255] new_thing;
-  char[255] input;
-};
